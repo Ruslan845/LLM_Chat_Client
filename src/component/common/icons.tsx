@@ -20,6 +20,26 @@ export const CollapseIcon = ({ className }: { className?: string }) => {
   );
 };
 
+export const ManagingUserIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-prefix="fas"
+      data-icon="users-cog"
+      className={className}
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 640 512"
+    >
+      <path
+        fill="currentColor"
+        d="M96 224c53 0 96-43 96-96s-43-96-96-96S0 75 0 128s43 96 96 96zm224 32c-61.9 0-112 50.1-112 112s50.1 112 112 112 112-50.1 112-112-50.1-112-112-112zm0 192c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80zm224-192c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm-224-32c-61.9 0-112 50.1-112 112s50.1 112 112 112 112-50.1 112-112-50.1-112-112-112zm0 192c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80zm224-192c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm-224-32c-61.9 0-112 50.1-112 112s50.1 112 112 112 112-50.1 112-112-50.1-112-112-112zm0 192c-44.2 0-80-35.8-80-80s35.8-80 80-80 80 35.8 80 80-35.8 80-80 80z"
+      ></path>
+    </svg>
+  );
+};
+
 export const LogoIcon = ({ className }: { className?: string }) => {
   return (
     <svg

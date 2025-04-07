@@ -5,7 +5,7 @@ import {
   FinanceIcon,
   SportsIcon,
 } from '@/component/common/icons';
-import SignUpButton from '../buttons/SignUpButton';
+import SignUpButton from '../buttons/LogOutButton';
 
 const InterestCard = () => {
   return (

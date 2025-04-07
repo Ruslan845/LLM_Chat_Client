@@ -1,6 +1,6 @@
 "use client"
 
-import SignUpButton from "@/component/common-component/buttons/SignUpButton"
+import SignUpButton from "@/component/common-component/buttons/LogOutButton"
 import Header from "@/component/layout/Header"
 import { AlignLeft, Clock, File, Lock, Sparkle } from "lucide-react"
 import { useRouter } from "next/navigation"
