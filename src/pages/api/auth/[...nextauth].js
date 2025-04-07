@@ -6,8 +6,8 @@ import LinkedInProvider from 'next-auth/providers/linkedin';
 export default NextAuth({
   providers: [
     GoogleProvider({
-      clientId: "28377823778-0h8kgdkjqht5ecemq8d3fqq17d5nh47p.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID,
