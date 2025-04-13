@@ -10,18 +10,18 @@ import {
   TwitterIcon,
   ManagingUserIcon,
 } from '../common/icons';
-import LearnMoreButton from '../common-component/buttons/LearnMoreButton';
 import NewThreadButton from '../common-component/buttons/NewThreadButton';
 import LogOutButton from '../common-component/buttons/LogOutButton';
-import DownloadButton from '../common-component/buttons/DownloadButton';
 import Link from 'next/link';
 import { LogIn, Sparkle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SiGnuprivacyguard } from 'react-icons/si';
 import { HiLogout } from 'react-icons/hi';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentUser } from '@/store/userSlice';
+import { setTitleList } from '@/store/chatSlice';
+import { gettitlelist } from '@/store/apis';
 
 const Sidebar = ({
   setCollapseSidebar,
@@ -32,53 +32,33 @@ const Sidebar = ({
 }) => {
   const [auth, useAuth] = useState(false);
   const pathname = usePathname(); // Get the current route
-  const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false); // State for is_admin
+  const router = useRouter(); 
   const dispatch = useDispatch();
+  const isAdmin = useSelector((state : any) => state.users.currentuser !== undefined ? state.users.currentuser.is_admin : null);
+  const user = useSelector((state: any) => state.users.currentuser)
+  const titlelist = useSelector((state : any) => state.chats.titlelist);
+  console.log("titlelist",titlelist);
+  console.log("type of titlelist:", typeof titlelist)
 
   useEffect(() => {
-    const userData = localStorage.getItem('userData');
-    if (userData) {
-      const parsedData = JSON.parse(userData);
-      setIsAdmin(parsedData.is_admin || false); // Set is_admin state
-    }
-  }, []);
-
-  // Function to get is_admin from localStorage
-  const getIsAdminFromLocalStorage = () => {
-    const userData = localStorage.getItem('userData');
-    if (userData) {
-      dispatch(setCurrentUser(userData));
-      try {
+    const data = async() => {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
         const parsedData = JSON.parse(userData);
-        console.log(parsedData)
-        return parsedData.is_admin || false; // Return is_admin or false if not present
-      } catch (error) {
-        console.error('Error parsing userData from localStorage:', error);
-        return false;
+        dispatch(setCurrentUser(parsedData)); // Dispatch the action to set user data in Redux
       }
+      await gettitlelist(user.id,dispatch).then((response: any) => {
+        console.log("Response in gettitlelist:", response);
+        dispatch(setTitleList(response.title_list));
+        // Handle the response here
+      }).catch((error: any) => {
+        console.error("Error:", error);
+        // Handle the error here
+      }
+      );
     }
-    return false;
-  };
-
-  // Update isAdmin state when localStorage changes
-  useEffect(() => {
-    // Set initial value
-    setIsAdmin(getIsAdminFromLocalStorage());
-
-    // Listen for localStorage changes
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'userData') {
-        setIsAdmin(getIsAdminFromLocalStorage());
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+    data();
+  }, [isAdmin]);
 
   // Hide the sidebar on specific routes (e.g., /auth)
   const isHidden = pathname === '/auth';
@@ -150,7 +130,7 @@ const Sidebar = ({
               className="text-gray-400 hover:text-gray-200 hover:bg-[#353636] py-2 px-4 rounded cursor-pointer  flex flex-row gap-2 items-center"
             >
               <LibraryIcon className="h-4 w-4" />
-              {!collapseSidebar && <p>Library</p>}
+              {!collapseSidebar && <p>Library {isAdmin}</p>}
             </Link>
             {isAdmin && (
               <Link
@@ -161,6 +141,16 @@ const Sidebar = ({
                 {!collapseSidebar && <p>User Management</p>}
               </Link>
             )}
+            {Array.isArray(titlelist) && titlelist.length > 0 ? titlelist.map((item: any, index: number) => (
+              <Link
+                href={`/chat/${item.chat_id}`}
+                key={index}
+                className="text-gray-400 hover:text-gray-200 hover:bg-[#353636] py-2 px-4 rounded cursor-pointer  flex flex-row gap-2 items-center"
+              >
+                <DiscordIcon className="h-4 w-4" />
+                {!collapseSidebar && <p>{item.chat_title}</p>}
+              </Link>
+            )) : null}
           </div>
         </div>
 

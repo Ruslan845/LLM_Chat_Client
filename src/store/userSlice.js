@@ -2,6 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   users: [],
+  currentuser: {
+    is_admin:false
+  },
   selectedUser: null,
   loading: false,
   error: null,
@@ -12,7 +15,15 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setCurrentUser(state, action) {
-      state.currentuser = action.payload; // Update the current user
+      console.log("state.currentuser: ", action.payload);
+      state.currentuser = action.payload;
+      // return {
+      //   ...state,
+      //   currentuser: action.payload
+      // }; // Update the current user
+      console.log(state.currentuser);
+      console.log('action.payload === state.currentuser', action.payload === state.currentuser);
+
     },
     setUsers(state, action) {
       state.users = action.payload; // Update the users array

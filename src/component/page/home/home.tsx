@@ -1,14 +1,55 @@
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import ChatText from "./chat";
-import { Settings } from "lucide-react";
-import Image from "next/image";
-import avatar_1 from "@/../public/avatar.png"
-import avatar_2 from "@/../public/avatar-2.jpg"
+import {
+  addchat,
+  gettitlelist
+} from "@/store/apis";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+
 
 
 const HomePage = () => {
+  let number = useSelector((state: any) => state.chat !== undefined ? state.chat.chat_id : null);
+  const user_id = useSelector((state: any) => state.users.currentuser !== undefined? state.users.currentuser.id : null);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  
+
+
+  const sendData = async (question : string, model : string) => {
+    // Function to handle sending data
+    console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
+    await addchat(question, user_id, model, dispatch).then((response: any) => {
+      console.log("Response in addchat:", response);
+      router.push(`/chat/${response.data.chat_list.chat_id}`);
+      // Handle the response here
+    }
+    ).catch((error: any) => {
+      console.error("Error:", error);
+      // Handle the error here
+    }
+    );
+    console.log("Data sent");
+    // number = null;
+  };
+
+  useEffect(() => {
+    const data = async() => {
+    await gettitlelist(user_id, dispatch).then((response: any) => {
+      console.log("Response:", response);
+      // Handle the response here
+    }
+    ).catch((error: any) => {
+      console.error("Error:", error);
+      // Handle the error here
+    }
+    );
+  }
+  }, []);
+
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Main Content */}
@@ -18,8 +59,8 @@ const HomePage = () => {
         </h1>
 
         {/* Search Bar */}
-        <ChatText />
-
+        <ChatText onSendData={sendData}/>
+        
         {/* Skill Selection */}
 
         {/* News and Stock Cards */}
@@ -33,7 +74,7 @@ const HomePage = () => {
             </span>
           </div>
 
-          <div className="w-full flex mt-4 gap-4 md:flex-row flex-col">
+          {/* <div className="w-full flex mt-4 gap-4 md:flex-row flex-col">
             <div className="bg-gray-800 md:w-1/3 p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="flex gap-2 items-center lg:text-xl"><Settings /> 73°F
@@ -55,7 +96,7 @@ const HomePage = () => {
               </div>
               <div className="max-lg:text-sm">Student Cracks Century-Old Math...</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -10,79 +10,89 @@ import {
   deleteUser,
 } from '@/store/apis';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/axios';
 
 const UserManagementPage = () => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state: any) => state.users); // Access currentUser from Redux
-  const [selectedUser, setSelectedUser] = useState<any>(null); // Local state for selected user
+  const { users, loading, error } = useSelector((state: any) => state.users);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string>('');
+  const [currentUser, setCurrentUser] = useState<any>({});
+  const [titleList, setTitleList] = useState([]);
+  const [chats, setChats] = useState([]);
+
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<any>({}); // Local state for current use
 
   useEffect(() => {
     const userData = localStorage.getItem('userData');
-    setCurrentUser(userData ? JSON.parse(userData) : {}); // Set current user from localStorage
+    setCurrentUser(userData ? JSON.parse(userData) : {});
   }, []);
 
   useEffect(() => {
     const userData = localStorage.getItem('userData');
     if (!userData) {
-      console.log('No userData found in localStorage');
-      router.push('/auth'); // Redirect to the login page
+      router.push('/auth');
     } else if (!JSON.parse(userData)?.is_admin) {
-      console.log('You cannot access this site. You are a user, not an admin.');
-      router.push('/home'); // Redirect to the home page
-    } else {
-      console.log('userData found:', JSON.parse(userData));
+      router.push('/home');
     }
   }, [router]);
 
-  // Fetch all users on component mount
   useEffect(() => {
-    getAllUsers(dispatch); // Call the API function with dispatch
+    getAllUsers(dispatch);
   }, [dispatch]);
 
-  // Fetch details of a selected user
   const handleUserSelect = async (user: any) => {
     try {
-      const userDetail = await getUserDetails(user.id, dispatch); // Fetch user details and update Redux state
-      setSelectedUser(userDetail); // Update local state for immediate UI updates
+      const userDetail = await getUserDetails(user.id, dispatch);
+      setSelectedUser(userDetail);
+      setSelectedChatId('');
+      const response = await api.post(`/gpt/gettitlelist/`, {
+        user_id: userDetail.id,
+      });
+      setTitleList(response.data.title_list);
+      setChats([]);
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
   };
 
-  // Handle suspend action
+  const changeSelectedChat = async (chatId: string) => {
+    setSelectedChatId(chatId);
+    const response = await api.post(`/gpt/getchat/`, {
+      chat_id: chatId,
+    });
+    setChats(response.data.chat_list.chat_list);
+  };
+
   const handleSuspend = async () => {
     if (selectedUser) {
       const updatedIsActive = !selectedUser.is_active;
       try {
-        await updateUserStatus(selectedUser.id, updatedIsActive, dispatch); // Update Redux state
-        setSelectedUser({ ...selectedUser, is_active: updatedIsActive }); // Update local state
+        await updateUserStatus(selectedUser.id, updatedIsActive, dispatch);
+        setSelectedUser({ ...selectedUser, is_active: updatedIsActive });
       } catch (error) {
         console.error('Error updating user active status:', error);
       }
     }
   };
 
-  // Handle admin toggle action
   const handleAdminToggle = async () => {
     if (selectedUser) {
       const updatedIsAdmin = !selectedUser.is_admin;
       try {
-        await updateUserAdminStatus(selectedUser.id, updatedIsAdmin, dispatch); // Update Redux state
-        setSelectedUser({ ...selectedUser, is_admin: updatedIsAdmin }); // Update local state
+        await updateUserAdminStatus(selectedUser.id, updatedIsAdmin, dispatch);
+        setSelectedUser({ ...selectedUser, is_admin: updatedIsAdmin });
       } catch (error) {
         console.error('Error updating admin status:', error);
       }
     }
   };
 
-  // Handle delete action
   const handleDelete = async () => {
     if (selectedUser) {
       try {
-        await deleteUser(selectedUser.id, dispatch, users); // Update Redux state
-        setSelectedUser(null); // Clear local state
+        await deleteUser(selectedUser.id, dispatch, users);
+        setSelectedUser(null);
       } catch (error) {
         console.error('Error deleting user:', error);
       }
@@ -99,9 +109,9 @@ const UserManagementPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* First Panel: User List */}
-      <div className="w-1/4 bg-white shadow-lg p-6 border-r">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">User List</h2>
+      {/* User List Panel */}
+      <div className="w-2/12 bg-white shadow-lg p-6 border-r overflow-y-auto">
+        <h2 className="text-xl font-bold text-gray-800 mb-6 sticky top-0 bg-white z-10">User List</h2>
         <ul className="space-y-4">
           {users.map((user: any) => (
             <li
@@ -118,19 +128,53 @@ const UserManagementPage = () => {
         </ul>
       </div>
 
-      {/* Second Panel: Placeholder */}
-      <div className="w-1/2 bg-gray-50 p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Welcome to Admin Panel</h2>
-        <p className="text-gray-600">
-          You can see chartlist of users.
-        </p>
+      {/* Chat Titles + History */}
+      <div className="flex w-7/12 border-r">
+        {/* Chat Titles Panel */}
+        <div className="w-4/12 bg-white shadow-lg p-6 border-r overflow-y-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-6 sticky top-0 bg-white z-10">Chats</h2>
+          <ul className="space-y-4">
+            {titleList.map((title: any) => (
+              <li
+                key={title.chat_id}
+                className={`p-4 rounded-lg cursor-pointer shadow-sm ${
+                  selectedChatId === title.chat_id ? 'bg-blue-100 border border-blue-500' : 'hover:bg-gray-100'
+                }`}
+                onClick={() => changeSelectedChat(title.chat_id)}
+              >
+                <p className="font-medium text-gray-800">{title.chat_title}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Chat History Panel */}
+        <div className="w-10/12 bg-white shadow-lg p-6 overflow-y-auto">
+          <h2 className="text-xl font-bold text-gray-800 mb-6 sticky top-0 bg-white z-10">Chat History</h2>
+          {selectedUser && selectedChatId && chats.length > 0 && (
+            <div className="space-y-4">
+              {chats.map((chat: any, index: number) => (
+                <div
+                  key={index}
+                  className={`p-4 rounded-lg shadow-sm ${
+                    chat.number % 2 === 1  ? 'bg-blue-50 text-right ml-auto' : 'bg-gray-100 text-left mr-auto'
+                  }`}
+                >
+                  <p className="font-semibold text-sm text-gray-600 mb-1">{chat.model}</p>
+                  <p className="text-gray-800">{chat.text}</p>
+                  <p className="text-xs text-gray-500 mt-2">{chat.date}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Third Panel: User Details */}
-      <div className="w-1/4 bg-white shadow-lg p-6 overflow-y-auto">
+      {/* User Details Panel */}
+      <div className="w-3/12 bg-white shadow-lg p-6 overflow-y-auto">
+        <h2 className="text-xl font-bold text-gray-800 mb-6 sticky top-0 bg-white z-10">User Details</h2>
         {selectedUser ? (
           <>
-            <h2 className="text-xl font-bold text-gray-800 mb-6">User Details</h2>
             <div className="flex flex-col items-center mb-6">
               <img
                 src={selectedUser.avatar || 'https://www.gravatar.com/avatar/?d=mp&f=y'}

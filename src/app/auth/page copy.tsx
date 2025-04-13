@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { setCurrentUser } from '@/store/userSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import GoogleLoginButton from '@/component/auth/GoogleLoginButton';
+import { useDispatch } from 'react-redux';
 
 const getCookie = (name: string): string | null => {
   const value = `; ${document.cookie}`;
@@ -18,7 +17,7 @@ const getCookie = (name: string): string | null => {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export default function SignInPage() {
+function SignInPage() {
   const { data: session } = useSession();
   const [method, setMethod] = useState<number | null>(null);
   const [isSignUp, setIsSignUp] = useState(false); // Toggle between Sign In and Sign Up
@@ -106,9 +105,7 @@ export default function SignInPage() {
       }
 
       // Save user data and redirect
-      dispatch(setCurrentUser(JSON.stringify(response.data.user))); // Update Redux state
-
-      console.log("state", useSelector((state : any) => state.currentuser?.is_admin))
+      dispatch(setCurrentUser(response.data.user)); // Update Redux state
       localStorage.setItem('userData', JSON.stringify(response.data.user));
       router.push('/'); // Redirect to the home page
     } catch (error) {
@@ -122,10 +119,6 @@ export default function SignInPage() {
     setMethod(1);
     localStorage.setItem('authMethod', '1');
     signIn('google', { callbackUrl: '/' });
-  };
-
-  const receiveErrorMessage = (message : string) => {
-    setErrorMessage(message);
   };
 
   if (loading) {
@@ -172,8 +165,7 @@ export default function SignInPage() {
           ) : (
             // Sign-In Buttons
             <div className="space-y-4">
-              <GoogleLoginButton onSendData={receiveErrorMessage}/>
-              {/* <button
+              <button
                 onClick={() => handleSignIn('google', 1)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
               >
@@ -183,7 +175,7 @@ export default function SignInPage() {
                   className="w-5 h-5 mr-2"
                 />
                 Sign in with Google
-              </button> */}
+              </button>
               {/* <button
                 onClick={() => handleSignIn('facebook', 2)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
