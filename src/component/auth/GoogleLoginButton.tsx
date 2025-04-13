@@ -29,17 +29,16 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
             const { user, idToken } = await googleSignIn();
             console.log("User signed in:", user);
             console.log("ID Token:", idToken);
+            setLoading(true); // Start loading
 
             await axios.get(`${API_BASE_URL}/auth/set-csrf-cookie/`, {
                 withCredentials: true, // Include cookies in the request
             });
 
             try {
-            setLoading(true); // Start loading
-            await axios.get(`${API_BASE_URL}/auth/set-csrf-cookie/`, {
-                withCredentials: true, // Include cookies in the request
-            });
             const csrfToken = getCookie('csrftoken');
+
+            console.log(csrfToken);
 
             const response = await axios.post(
                 `${API_BASE_URL}/auth/google/`,
