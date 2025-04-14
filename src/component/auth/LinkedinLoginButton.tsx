@@ -27,7 +27,9 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
     const authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${LINKEDIN_CLIENT_ID}&redirect_uri=${encodeURIComponent(
       REDIRECT_URI
     )}&state=${state}&scope=${encodeURIComponent(scope)}`
+    console.log(authUrl)
     window.location.href = authUrl
+    console.log('Redirecting to LinkedIn...')
   }
 
   // Step 2: Handle callback (code in URL)
