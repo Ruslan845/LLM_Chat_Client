@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { setCurrentUser } from '@/store/userSlice';
@@ -174,7 +174,9 @@ export default function SignInPage() {
             // Sign-In Buttons
             <div className="space-y-4">
               <GoogleLoginButton onSendData={receiveErrorMessage}/>
-              <LinkedInLoginButton onSendData={receiveErrorMessage}/>
+              <Suspense fallback={<div>Loading auth page...</div>}>
+                <LinkedInLoginButton onSendData={receiveErrorMessage}/>
+              </Suspense>
               {/* <button
                 onClick={() => handleSignIn('google', 1)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"

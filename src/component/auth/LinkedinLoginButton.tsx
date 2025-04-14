@@ -16,9 +16,9 @@ interface ChildProps {
 }
 
 export default function LinkedInAuth({onSendData} : ChildProps) {
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const router = useRouter()
+  const router = useRouter();
 
   // Step 1: Redirect user to LinkedIn
   const handleLogin = () => {
