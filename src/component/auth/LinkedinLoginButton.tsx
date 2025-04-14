@@ -23,13 +23,12 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
   // Step 1: Redirect user to LinkedIn
   const handleLogin = () => {
     const state = Math.random().toString(36).substring(7) // You can persist this to verify later
+    localStorage.setItem('linkedin_oauth_state', state); // Persist this to verify later
     const scope = 'r_liteprofile r_emailaddress'
     const authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${LINKEDIN_CLIENT_ID}&redirect_uri=${encodeURIComponent(
       REDIRECT_URI
     )}&state=${state}&scope=${encodeURIComponent(scope)}`
-    console.log(authUrl)
-    // window.location.href = authUrl
-    console.log('Redirecting to LinkedIn...')
+    window.location.href = authUrl
   }
 
   // Step 2: Handle callback (code in URL)
@@ -37,7 +36,6 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
     console.log("before:");
     const code = searchParams ? searchParams.get('code') : null;
     const state = searchParams ? searchParams.get('state') : null;
-    console.log('LinkedIn code:', code)
 
     if (code) {
       const sendCodeToBackend = async () => {
