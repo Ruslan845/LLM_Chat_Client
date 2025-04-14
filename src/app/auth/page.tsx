@@ -189,7 +189,7 @@ export default function SignInPage() {
                 />
                 Sign in with Facebook
               </button> */}
-              <button
+              {/* <button
                 onClick={() => handleSignIn('linkedin', 3)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
               >
@@ -199,7 +199,7 @@ export default function SignInPage() {
                   className="w-5 h-5 mr-2"
                 />
                 Sign in with LinkedIn
-              </button>
+              </button> */}
             </div>
           )}
           <div className="text-center">
