@@ -35,6 +35,9 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
     const code = searchParams ? searchParams.get('code') : null;
     const state = searchParams ? searchParams.get('state') : null;
 
+
+    console.log('LinkedIn code:', code)
+
     if (code) {
       const sendCodeToBackend = async () => {
         try {
