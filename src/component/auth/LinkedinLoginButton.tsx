@@ -32,10 +32,9 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
 
   // Step 2: Handle callback (code in URL)
   useEffect(() => {
+    console.log("before:");
     const code = searchParams ? searchParams.get('code') : null;
     const state = searchParams ? searchParams.get('state') : null;
-
-
     console.log('LinkedIn code:', code)
 
     if (code) {
