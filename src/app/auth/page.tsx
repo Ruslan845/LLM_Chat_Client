@@ -202,7 +202,7 @@ export default function SignInPage() {
               </button> */}
             </div>
           )}
-          <div className="text-center">
+          {/* <div className="text-center">
             <p className="text-sm text-gray-600">
               {isSignUp
                 ? 'Already have an account?'
@@ -214,7 +214,7 @@ export default function SignInPage() {
                 {isSignUp ? 'Sign In' : 'Sign Up'}
               </button>
             </p>
-          </div>
+          </div> */}
         </>
       </div>
     </div>

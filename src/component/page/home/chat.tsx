@@ -12,18 +12,28 @@ interface ChildProps {
 const ChatText = ({onSendData} : ChildProps) => {
     const [file, setFile] = useState(null);
     const [question, setQuestion] = useState("");
-    const [model, setModel] = useState("");
+    const [model, setModel] = useState("gpt-3.5-turbo");
 
     const options = [
         {
-            title: "gpt-3.5-turbo",
+            title: "gpt-4",
             icon: Shuffle,
-            description: "Cheapest and best free start"
+            description: "Original GPT-4, slower and more expensive than Turbo."
         },
         {
-            title: "text-davinci-003",
+            title: "gpt-4-turbo",
             icon: LoaderPinwheel,
-            description: "Legacy completion model"
+            description: "Faster, cheaper, and supports larger context windows (up to 128K tokens). Preferred for most GPT-4 use."
+        },
+        {
+            title: "gpt-3.5-turbo",
+            icon: Shuffle,
+            description: "Fast, affordable, great for most tasks."
+        },
+        {
+            title: "gpt-3.5-turbo-16k",
+            icon: LoaderPinwheel,
+            description: "Same as above, but with 4x more context length."
         },
         // {
         //     title: "Reasoning",
@@ -61,7 +71,7 @@ const ChatText = ({onSendData} : ChildProps) => {
             <input
                 type="text"
                 placeholder="Ask anything..."
-                className="flex-1 bg-transparent text-white focus:outline-none placeholder-gray-400"
+                className="w-full flex-1 bg-transparent text-white focus:outline-none placeholder-gray-400"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
             />
