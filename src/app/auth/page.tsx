@@ -52,12 +52,12 @@ export default function SignInPage() {
 
   // Send token to backend when session and method are available
   useEffect(() => {
-    console.log(session, method)
-    if (session && method !== null && !localStorage.getItem('userData')) {
-      setLoading(true); // Start loading
-      console.log('Session updated, sending token to backend...');
-      sendTokenToBackend(method, session);
-    }
+    console.log(session)
+    // if (session && method !== null && !localStorage.getItem('userData')) {
+    //   setLoading(true); // Start loading
+    //   console.log('Session updated, sending token to backend...');
+    //   sendTokenToBackend(method, session);
+    // }
   }, [session, method]);
 
   const handleSignIn = (provider: string, methodValue: number) => {
@@ -76,23 +76,13 @@ export default function SignInPage() {
     try {
       setLoading(true); // Start loading
 
-      // Set CSRF cookie
-      await axios.get(`${API_BASE_URL}/auth/set-csrf-cookie/`, {
-        withCredentials: true, // Include cookies in the request
-      });
-      console.log('CSRF cookie set successfully');
-
-      const csrfToken = getCookie('csrftoken');
-      console.log('CSRF Token:', csrfToken); // Debugging CSRF token
-
       // Send token to the backend
       const response = await axios.post(
-        urls[methodValue - 1],
+        `${API_BASE_URL}/auth/linkedin/`,
         { token: methodValue == 1 ? session?.idToken : session?.accessToken },
         {
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken || '',
           },
           withCredentials: true, // Include cookies in the request
         }
@@ -174,9 +164,9 @@ export default function SignInPage() {
             // Sign-In Buttons
             <div className="space-y-4">
               <GoogleLoginButton onSendData={receiveErrorMessage}/>
-              <Suspense fallback={<div>Loading auth page...</div>}>
+              {/* <Suspense fallback={<div>Loading auth page...</div>}>
                 <LinkedInLoginButton onSendData={receiveErrorMessage}/>
-              </Suspense>
+              </Suspense> */}
               {/* <button
                 onClick={() => handleSignIn('google', 1)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
@@ -199,7 +189,7 @@ export default function SignInPage() {
                 />
                 Sign in with Facebook
               </button> */}
-              {/* <button
+              <button
                 onClick={() => handleSignIn('linkedin', 3)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
               >
@@ -209,7 +199,7 @@ export default function SignInPage() {
                   className="w-5 h-5 mr-2"
                 />
                 Sign in with LinkedIn
-              </button> */}
+              </button>
             </div>
           )}
           <div className="text-center">
