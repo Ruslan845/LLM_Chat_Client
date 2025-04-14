@@ -9,7 +9,7 @@ import { setCurrentUser } from '@/store/userSlice'
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 const LINKEDIN_CLIENT_ID = process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID!
-const REDIRECT_URI = `${process.env.NEXT_PUBLIC_AUTH_URL}/auth/linkedin`
+const REDIRECT_URI = `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`
 
 interface ChildProps {
     onSendData: (data: string) => void;
@@ -32,8 +32,8 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
 
   // Step 2: Handle callback (code in URL)
   useEffect(() => {
-    const code = searchParams?.get('code')
-    const state = searchParams?.get('state')
+    const code = searchParams ? searchParams.get('code') : null;
+    const state = searchParams ? searchParams.get('state') : null;
 
     if (code) {
       const sendCodeToBackend = async () => {
