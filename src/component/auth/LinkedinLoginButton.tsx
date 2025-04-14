@@ -28,7 +28,7 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
       REDIRECT_URI
     )}&state=${state}&scope=${encodeURIComponent(scope)}`
     console.log(authUrl)
-    window.location.href = authUrl
+    // window.location.href = authUrl
     console.log('Redirecting to LinkedIn...')
   }
 
