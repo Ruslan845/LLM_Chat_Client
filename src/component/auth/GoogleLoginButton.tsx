@@ -95,7 +95,7 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
     };
     
     return (
-        <button onClick={handleGoogleLogin} className="bg-blue-500 text-white p-2 rounded flex items-center justify-center w-full">
+        <button onClick={handleGoogleLogin} className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
             <img
                 src="/google-icon.svg"
                 alt="Google"
