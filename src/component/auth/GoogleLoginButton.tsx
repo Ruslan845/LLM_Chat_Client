@@ -27,8 +27,8 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
     const handleGoogleLogin = async () => {
         try {
             const { user, idToken } = await googleSignIn();
-            console.log("User signed in:", user);
-            console.log("ID Token:", idToken);
+            // console.log("User signed in:", user);
+            // console.log("ID Token:", idToken);
             setLoading(true); // Start loading
 
             await axios.get(`${API_BASE_URL}/auth/set-csrf-cookie/`, {
@@ -38,7 +38,7 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
             try {
             const csrfToken = getCookie('csrftoken');
 
-            console.log(csrfToken);
+            // console.log(csrfToken);
 
             const response = await axios.post(
                 `${API_BASE_URL}/auth/google/`,
@@ -52,7 +52,7 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
                 }
             );
 
-            console.log('Data sent successfully:', response.data);
+            // console.log('Data sent successfully:', response.data);
 
             // Check if the account is active
             if (!response.data.user.is_active) {
@@ -63,8 +63,8 @@ const GoogleLoginButton = ({onSendData} : ChildProps) => {
             localStorage.setItem('access', response.data.access_token);
             localStorage.setItem('refrest', response.data.refresh_token);
             localStorage.setItem('userData', JSON.stringify(response.data.user));
-            console.log(response.data)
-            console.log(localStorage.getItem("userData"))
+            // console.log(response.data)
+            // console.log(localStorage.getItem("userData"))
             dispatch(setCurrentUser(response.data.user)); // Update Redux state
             router.push('/'); // Redirect to the home page
             

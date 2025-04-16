@@ -157,7 +157,7 @@ const UserManagementPage = () => {
                 <div
                   key={index}
                   className={`p-4 rounded-lg shadow-sm ${
-                    chat.number % 2 === 1  ? 'bg-blue-50 text-right ml-auto' : 'bg-gray-100 text-left mr-auto'
+                    chat.role == "user"  ? 'bg-blue-50 text-right ml-auto' : 'bg-gray-100 text-left mr-auto'
                   }`}
                 >
                   <p className="font-semibold text-sm text-gray-600 mb-1">{chat.model}</p>

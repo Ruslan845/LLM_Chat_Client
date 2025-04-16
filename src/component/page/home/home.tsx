@@ -21,10 +21,10 @@ const HomePage = () => {
 
   const sendData = async (question : string, model : string) => {
     // Function to handle sending data
-    console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
+    // console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
     await addchat(question, user_id, model, dispatch).then((response: any) => {
-      console.log("Response in addchat:", response);
-      router.push(`/chat/${response.data.chat_list.chat_id}`);
+      // console.log("Response in addchat:", response);
+      router.push(`/chat/${response.chat_list.chat_id}`);
       // Handle the response here
     }
     ).catch((error: any) => {
@@ -32,14 +32,14 @@ const HomePage = () => {
       // Handle the error here
     }
     );
-    console.log("Data sent");
+    // console.log("Data sent");
     // number = null;
   };
 
   useEffect(() => {
     const data = async() => {
     await gettitlelist(user_id, dispatch).then((response: any) => {
-      console.log("Response:", response);
+      // console.log("Response:", response);
       // Handle the response here
     }
     ).catch((error: any) => {

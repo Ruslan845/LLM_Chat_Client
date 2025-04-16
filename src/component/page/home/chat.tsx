@@ -1,16 +1,20 @@
 "use client"
 
 import { Atom, Lightbulb, LoaderPinwheel, Shuffle } from "lucide-react";
-import { FaGlobe, FaPaperclip, FaArrowRight } from "react-icons/fa";
+import { FaGlobe, FaPaperclip, FaArrowRight, FaStop } from "react-icons/fa";
 import ComboboxExt from "../../common-component/combobox";
 import { useState } from "react";
+
+type Props = {
+    isfinished? : Boolean;
+}
 
 interface ChildProps {
     onSendData: (data: string, data1 : string) => void;
 }
 
-const ChatText = ({onSendData} : ChildProps) => {
-    const [file, setFile] = useState(null);
+const ChatText = ({onSendData, isfinished} : ChildProps & Props) => {
+    const [file, setFile] = useState(null);0
     const [question, setQuestion] = useState("");
     const [model, setModel] = useState("gpt-3.5-turbo");
 
@@ -62,8 +66,15 @@ const ChatText = ({onSendData} : ChildProps) => {
     };
 
     const onValueChange = (value: string) => {
-        console.log("onValueChange", value);
+        // console.log("onValueChange", value);
         setModel(value);
+    };
+
+    const handleKeyDown = (e : React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Enter') {
+            handleSendQuestion();
+            e.preventDefault(); // Prevent form submission when Enter key is pressed
+        }
     };
 
     return (
@@ -73,6 +84,7 @@ const ChatText = ({onSendData} : ChildProps) => {
                 placeholder="Ask anything..."
                 className="w-full flex-1 bg-transparent text-white focus:outline-none placeholder-gray-400"
                 value={question}
+                onKeyDown={handleKeyDown}
                 onChange={(e) => setQuestion(e.target.value)}
             />
 
@@ -88,16 +100,15 @@ const ChatText = ({onSendData} : ChildProps) => {
                         <FaGlobe />
                     </button>
 
-
                     <button className="mx-2 text-gray-400 hover:text-white relative">
                         <input type="file" className="w-6 h-6 cursor-pointer absolute top-1 left-[-5px] opacity-0" onChange={(e) => handleFileChange(e)} />
                         <FaPaperclip />
                     </button>
-
                     <button className="bg-gray-700 p-2 rounded-3xl text-gray-400 hover:bg-gray-600" onClick={handleSendQuestion}>
-                        <FaArrowRight />
+                    {isfinished ?
+                        <FaArrowRight /> : <FaStop />
+                    }
                     </button>
-
                 </div>
             </div>
         </div>

@@ -53,11 +53,11 @@ export default function SignInPage() {
   // Send token to backend when session and method are available
   useEffect(() => {
     console.log(session)
-    // if (session && method !== null && !localStorage.getItem('userData')) {
-    //   setLoading(true); // Start loading
-    //   console.log('Session updated, sending token to backend...');
-    //   sendTokenToBackend(method, session);
-    // }
+    if (session && method !== null && !localStorage.getItem('userData')) {
+      setLoading(true); // Start loading
+      console.log('Session updated, sending token to backend...');
+      sendTokenToBackend(method, session);
+    }
   }, [session, method]);
 
   const handleSignIn = (provider: string, methodValue: number) => {
@@ -78,7 +78,7 @@ export default function SignInPage() {
 
       // Send token to the backend
       const response = await axios.post(
-        `${API_BASE_URL}/auth/linkedin/`,
+        `${API_BASE_URL}/auth/google/`,
         { token: methodValue == 1 ? session?.idToken : session?.accessToken },
         {
           headers: {
@@ -88,7 +88,7 @@ export default function SignInPage() {
         }
       );
 
-      console.log('Data sent successfully:', response.data);
+      // console.log('Data sent successfully:', response.data);
 
       // Check if the account is active
       if (!response.data.user.is_active) {
@@ -96,10 +96,12 @@ export default function SignInPage() {
         return; // Stop further execution and prevent URL change
       }
 
-      // Save user data and redirect
-      dispatch(setCurrentUser(JSON.stringify(response.data.user))); // Update Redux state
+      // Save user data and redirect            
+      dispatch(setCurrentUser(response.data.user)); // Update Redux state
 
-      console.log("state", useSelector((state : any) => state.currentuser?.is_admin))
+      // console.log("state", useSelector((state : any) => state.currentuser?.is_admin))
+      localStorage.setItem('access', response.data.access_token);
+      localStorage.setItem('refrest', response.data.refresh_token);
       localStorage.setItem('userData', JSON.stringify(response.data.user));
       router.push('/'); // Redirect to the home page
     } catch (error) {
@@ -163,11 +165,11 @@ export default function SignInPage() {
           ) : (
             // Sign-In Buttons
             <div className="space-y-4">
-              <GoogleLoginButton onSendData={receiveErrorMessage}/>
+              {/* <GoogleLoginButton onSendData={receiveErrorMessage}/> */}
               {/* <Suspense fallback={<div>Loading auth page...</div>}>
                 <LinkedInLoginButton onSendData={receiveErrorMessage}/>
               </Suspense> */}
-              {/* <button
+              <button
                 onClick={() => handleSignIn('google', 1)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"
               >
@@ -177,7 +179,7 @@ export default function SignInPage() {
                   className="w-5 h-5 mr-2"
                 />
                 Sign in with Google
-              </button> */}
+              </button>
               {/* <button
                 onClick={() => handleSignIn('facebook', 2)}
                 className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100"

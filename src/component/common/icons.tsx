@@ -24,7 +24,7 @@ export const ManagingUserIcon = ({ className }: { className?: string }) => {
   return (
     <svg
       aria-hidden="true"
-      focusable="false"
+      focusable="false"   
       data-prefix="fas"
       data-icon="users-cog"
       className={className}
@@ -217,6 +217,26 @@ export const LearnMoreIcon = ({ className }: { className?: string }) => {
       <path
         fill='currentColor'
         d='M328 96c13.3 0 24 10.7 24 24V360c0 13.3-10.7 24-24 24s-24-10.7-24-24V177.9L73 409c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l231-231H88c-13.3 0-24-10.7-24-24s10.7-24 24-24H328z'
+      ></path>
+    </svg>
+  );
+};
+
+export const ChatBotIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 64 64"
+      width="64"
+      height="64"
+      className={className}
+    >
+      <path
+        fill="currentColor"
+        d="M32 4C15.4 4 4 15.4 4 32c0 6.4 1.9 12.4 5 17.4L0 60l10.6-4.1C16.6 58 24.1 64 32 64c16.6 0 28-11.4 28-28S48.6 4 32 4zm0 50c-9.6 0-18-5.4-21-12.8L15.2 36c1.2 1.6 2.8 3.2 4.8 4.4C22.6 42.4 27.2 44 32 44s9.4-1.6 12-3.6c2-1.2 3.6-3 4.8-4.6l4.2 4.2C50 49.6 41.6 54 32 54zM32 8c13.3 0 24 10.7 24 24s-10.7 24-24 24c-13.3 0-24-10.7-24-24S18.7 8 32 8zm-4 16c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm8 16c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4z"
       ></path>
     </svg>
   );

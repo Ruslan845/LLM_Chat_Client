@@ -18,7 +18,7 @@ export const getAllUsers = async (dispatch) => {
 export const getUserDetails = async (userId, dispatch) => {
   try {
     const response = await api.get(`/admin/getoneuser/${userId}/`);
-    console.log(response.data);
+    // console.log(response.data);
     dispatch(setSelectedUser(response.data)); // Dispatch the selected user to Redux
     return response.data;
   } catch (error) {
@@ -103,7 +103,7 @@ export const getchat = async (chatid, dispatch) => {
     const response = await api.post(`/gpt/getchat/`,{
       chat_id : chatid,
     });
-    console.log(response);
+    // console.log(response);
     dispatch(setList(response.data.chat_list.chat_list)); // Dispatch the fetched chat to Redux)
     return response.data;
   } catch (error) {
@@ -119,9 +119,8 @@ export const askquestion = async (question, model, id, dispatch) => {
       model : model,
       chat_id : id,
     });
-    dispatch(addtext(response.data.question));
     dispatch(addtext(response.data.answer)); // Dispatch the fetched chat to Redux
-    console.log("after dispatching", response.data);
+    // console.log("after dispatching", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching chat:', error);

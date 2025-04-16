@@ -15,14 +15,14 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setCurrentUser(state, action) {
-      console.log("state.currentuser: ", action.payload);
+      // console.log("state.currentuser: ", action.payload);
       state.currentuser = action.payload;
       // return {
       //   ...state,
       //   currentuser: action.payload
       // }; // Update the current user
-      console.log(state.currentuser);
-      console.log('action.payload === state.currentuser', action.payload === state.currentuser);
+      // console.log(state.currentuser);
+      // console.log('action.payload === state.currentuser', action.payload === state.currentuser);
 
     },
     setUsers(state, action) {

@@ -33,7 +33,7 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
 
   // Step 2: Handle callback (code in URL)
   useEffect(() => {
-    console.log("before:");
+    // console.log("before:");
     const code = searchParams ? searchParams.get('code') : null;
     const state = searchParams ? searchParams.get('state') : null;
 
@@ -46,7 +46,7 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
             { withCredentials: true }
           )
 
-        console.log('Data sent successfully:', response.data);
+        // console.log('Data sent successfully:', response.data);
 
         // Check if the account is active
         if (!response.data.user.is_active) {
@@ -57,8 +57,8 @@ export default function LinkedInAuth({onSendData} : ChildProps) {
         localStorage.setItem('access', response.data.access_token);
         localStorage.setItem('refrest', response.data.refresh_token);
         localStorage.setItem('userData', JSON.stringify(response.data.user));
-        console.log(response.data)
-        console.log(localStorage.getItem("userData"))
+        // console.log(response.data)
+        // console.log(localStorage.getItem("userData"))
         dispatch(setCurrentUser(response.data.user)); // Update Redux state
         router.push('/'); // Redirect to the home page
             
