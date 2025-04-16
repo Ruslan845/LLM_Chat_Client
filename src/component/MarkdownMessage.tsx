@@ -37,7 +37,7 @@ export default function MarkdownReveal({ content, speed = 300, onSendData }: Pro
   }, [content, speed]);
 
   return (
-    <div className="prose prose-lg max-w-none text-gray-800 p-4">
+    <div className="prose prose-lg max-w-none text-white p-4">
       <ReactMarkdown>{currentContent}</ReactMarkdown>
     </div>
   );

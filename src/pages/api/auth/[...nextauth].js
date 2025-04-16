@@ -10,28 +10,30 @@ export default NextAuth({
       clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
     }),
     FacebookProvider({
-      clientId: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET,
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
     }),
     LinkedInProvider({
-      clientId: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID,
-      clientSecret: process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_SECRET,
+      clientId: process.env.LINKEDIN_CLIENT_ID,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
     }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
-      // Add access token to the token object
-      if (account && profile) {
+    async jwt({ token, account }) {
+      if (account) {
         token.accessToken = account.access_token;
         token.idToken = account.id_token;
       }
       return token;
     },
     async session({ session, token }) {
-      // Add access token to the session object
       session.accessToken = token.accessToken;
       session.idToken = token.idToken;
       return session;
     },
   },
+  pages: {
+    signIn: '/auth',
+  },
+  debug: true, // Enable this for verbose logging
 });
