@@ -20,6 +20,66 @@ export const CollapseIcon = ({ className }: { className?: string }) => {
   );
 };
 
+export const AdministratorIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-prefix="fas"
+      data-icon="user-gear"
+      className={className}
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 640 512"
+    >
+      <path
+        fill="currentColor"
+        d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zM96 288C43 288 0 331 0 384v32c0 35.3 28.7 64 64 64H341.9c-3.7-10.1-5.9-20.9-5.9-32c0-57.3 46.7-104 104-104c5.4 0 10.7 .4 15.9 1.3c3.8-10.6 6.1-22 6.1-33.9c0-8.4-1-16.6-2.9-24.5c-3.8-.6-7.8-.9-11.8-.9H96zM640 432c0 44.2-35.8 80-80 80s-80-35.8-80-80s35.8-80 80-80s80 35.8 80 80zm-88-48v16c-5.5 0-10 4.5-10 10v44c0 5.5 4.5 10 10 10h16c5.5 0 10-4.5 10-10V410c0-5.5-4.5-10-10-10h-16z"
+      ></path>
+    </svg>
+  );
+};
+
+export const ChatHistoryIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-prefix="fas"
+      data-icon="comments"
+      className={className}
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 640 512"
+    >
+      <path
+        fill="currentColor"
+        d="M208 48C93.1 48 0 125.1 0 216c0 41.2 19.2 79.1 51.1 108.7C46 353.4 34.7 390 2.8 417.4C-1.5 421.1-1 428 .3 432.6s6.2 7.4 11.3 7.4c63.6 0 114.9-28.4 143.7-51.2c16.6 4.5 34.5 6.9 52.7 6.9c114.9 0 208-77.1 208-168S322.9 48 208 48zm432 264c0-66.4-49.1-123.1-120-148.4c9.1 17.6 14 37 14 57.4c0 91-79.8 167.1-181.7 181.1c35.3 45.1 98.9 75.9 172.7 75.9c18.2 0 36.1-2.4 52.7-6.9c28.8 22.9 80.1 51.2 143.7 51.2c5.1 0 9.8-2.9 11.3-7.4s1.8-11.5-2.4-15.2c-31.8-27.4-43.1-64-48.3-92.7C620.8 391.1 640 353.2 640 312z"
+      ></path>
+    </svg>
+  );
+};
+
+export const ApiKeyIcon = ({ className }: { className?: string }) => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      data-prefix="fas"
+      data-icon="key"
+      className={className}
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 512 512"
+    >
+      <path
+        fill="currentColor"
+        d="M512 128c0 70.7-57.3 128-128 128c-11.6 0-22.9-1.6-33.6-4.6L188.7 413.2c-6 6-14.1 9.4-22.6 9.4H136v40c0 13.3-10.7 24-24 24H72c-13.3 0-24-10.7-24-24V448H24c-13.3 0-24-10.7-24-24V368c0-13.3 10.7-24 24-24H64l64-64V256c0-8.5 3.4-16.6 9.4-22.6L260.6 110.4C257.6 99.6 256 88.3 256 76c0-70.7 57.3-128 128-128s128 57.3 128 128zM432 76a28 28 0 1 0 0 56 28 28 0 1 0 0-56z"
+      ></path>
+    </svg>
+  );
+};
+
 export const ManagingUserIcon = ({ className }: { className?: string }) => {
   return (
     <svg

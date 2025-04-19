@@ -14,14 +14,12 @@ interface ChildProps {
 export default function MarkdownReveal({ content, speed = 300, onSendData }: Props & ChildProps) {
   const words = content.split(" ");
   const [currentContent, setCurrentContent] = useState("");
-  console.log("words: ", words);
 
   useEffect(() => {
-    console.log("content: ", content);
     let index = 0;
 
     const interval = setInterval(() => {
-      if (index < words.length) {
+      if (index < words.length - 1) {
         setCurrentContent( (prev:any) =>
           prev + (prev ? " " : "") + words[index]
         );
@@ -30,7 +28,6 @@ export default function MarkdownReveal({ content, speed = 300, onSendData }: Pro
         clearInterval(interval);
         onSendData(true);
       }
-      console.log("currentContent: ", currentContent);
     }, speed);
 
     return () => clearInterval(interval);

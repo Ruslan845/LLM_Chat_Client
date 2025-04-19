@@ -15,15 +15,18 @@ const HomePage = () => {
   let number = useSelector((state: any) => state.chat !== undefined ? state.chat.chat_id : null);
   const user_id = useSelector((state: any) => state.users.currentuser !== undefined? state.users.currentuser.id : null);
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
   
 
 
-  const sendData = async (question : string, model : string) => {
+  const sendData = async (question : string, model : string, tem : number, token : number) => {
     // Function to handle sending data
+    setLoading(true);
     // console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
-    await addchat(question, user_id, model, dispatch).then((response: any) => {
+    await addchat(question, user_id, model, tem, token, dispatch).then((response: any) => {
       // console.log("Response in addchat:", response);
+      setLoading(false);
       router.push(`/chat/${response.chat_list.chat_id}`);
       // Handle the response here
     }
