@@ -28,7 +28,7 @@ const modelOptions = {
       { title: "gpt-4o(Omni)", icon: Microscope, description: "Best for: Real-time multimodal interaction", value: "gpt-4o", maxtoken: 8192 },
       { title: "gpt-4-turbo", icon: Cpu, description: "Best for: Cost-effective coding reasoning", value: "gpt-4-turbo", maxtoken: 16384 },
       { title: "gpt-3.5-turbo", icon: Zap, description: "Best for: Lightweight & fast tasks", value: "gpt-3.5-turbo", maxtoken: 4096 },
-      { title: "gpt-4(legacy)", icon: BrainCircuit, description: "Best for: Logical reasoning & complex tasks", value: "text-davinci-003", maxtoken: 4096 },
+      { title: "gpt-4(legacy)", icon: BrainCircuit, description: "Best for: Logical reasoning & complex tasks", value: "gpt-4", maxtoken: 4096 },
     ],
   },
   DeepSeek: {
@@ -143,17 +143,17 @@ const TwoStepModelSelector = ({ model, onModelChange }: TwoStepModelSelectorProp
 };
 
 type Props = {
-  isfinished?: boolean;
+  isfinished?: boolean, startmodel: string;
 };
 
 interface ChildProps {
-  onSendData: (data: string, data1: string, tem: number, token: number, web: boolean) => void;
+  onSendData: (data: string, model: string, tem: number, token: number, web: boolean) => void;
 }
 
-const ChatText = ({ onSendData, isfinished }: ChildProps & Props) => {
+const ChatText = ({ onSendData, isfinished, startmodel }: ChildProps & Props) => {
   const [file, setFile] = useState<File | null>(null);
   const [question, setQuestion] = useState("");
-  const [model, setModel] = useState("gpt-3.5-turbo");
+  const [model, setModel] = useState(startmodel);
   const [temperature, setTemperature] = useState(0.7);
   const [maxToken, setMaxToken] = useState(1000);
   const [max, setMax] = useState(4096);
@@ -166,6 +166,10 @@ const ChatText = ({ onSendData, isfinished }: ChildProps & Props) => {
     const max_v = Object.values(modelOptions).flatMap((group) => group.options).find((m) => m.value === model)?.maxtoken;
     if (max_v) setMax(max_v);
   }, [model]);
+
+  useEffect(() => {
+    setModel(startmodel);
+  }, [startmodel])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => setFile(e.target.files?.[0] || null);
 
@@ -207,6 +211,7 @@ const ChatText = ({ onSendData, isfinished }: ChildProps & Props) => {
               onClick={() => setWebSearchEnabled(prev => !prev)}
             >
               <FaGlobe />
+              {model}
             </button>
             <span className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-700 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
               Web search

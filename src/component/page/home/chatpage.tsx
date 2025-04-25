@@ -5,14 +5,15 @@ import ChatText from "./chat";
 import { useDispatch, useSelector } from 'react-redux';
 import { askquestion, getchat, deletechatmessage } from '@/store/apis';
 import MarkdownReveal from '@/component/MarkdownMessage';
-import { addtext, Setold } from '@/store/chatSlice';
 import { FaTrash } from 'react-icons/fa';
+import { start } from 'repl';
 
 const ChatPage = ({ id }: { id: string }) => {
   const user = useSelector((state: any) => state.users.currentuser);
   const messages = useSelector((state: any) => state.chats.chats);
-  const [loading, setLoading] = useState(false);
-  const [typing, setTyping] = useState(false);
+  const [loading, setLoading] = useState<any>(false);
+  const [typing, setTyping] = useState<any>(false);
+  const [startmodel, setStartmodel] = useState<any>("gpt-3.5-turbo");
   const [deletingMessageId, setDeletingMessageId] = useState<number | null>(null);
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
@@ -20,33 +21,37 @@ const ChatPage = ({ id }: { id: string }) => {
   useEffect(() => {
     const get = async () => {
       try {
-        await getchat(id, dispatch);
+        setLoading(true)
+        const as_string = localStorage.getItem("newChat")
+        if(as_string)
+        {
+          localStorage.removeItem("newChat")
+          const newchat = JSON.parse(as_string);
+          setStartmodel(newchat.model);
+          await askquestion(newchat.question, newchat.model, id, newchat.tem, newchat.token, dispatch )
+        }
+        else{
+          await getchat(id, dispatch);
+        }
+        setLoading(false)
       } catch (error: any) {
         console.error("Error:", error);
       }
     };
-    get();
+    if(id)
+      get();
   }, [id]);
 
   const sendData = async (question: string, model: string, tem: number, token: number, web: boolean) => {
     setLoading(true);
-    const date = new Date();
-    const date_string = date.toISOString().replace('Z', '') + '000';
-    dispatch(addtext({
-      role: "user",
-      text: question,
-      model,
-      date: date_string,
-      deleteddate: null,
-      isnew: false,
-    }));
+    console.log(question, model, tem, token)
     setTyping(true);
     try {
-      await askquestion(question, model, id, tem, token, web, dispatch);
-      scrollToBottom();
+      await askquestion(question, model, id, tem, token, dispatch);
     } catch (error: any) {
       console.error("Error:", error);
     }
+    scrollToBottom();
     setLoading(false);
   };
 
@@ -63,13 +68,6 @@ const ChatPage = ({ id }: { id: string }) => {
   const scrollToBottom = () => {
     if (scrollRef.current) {
       (scrollRef.current as HTMLElement).scrollTop = (scrollRef.current as HTMLElement).scrollHeight;
-    }
-  };
-
-  const onSendData = (para: Boolean) => {
-    if (para) {
-      setTyping(false);
-      dispatch(Setold(false));
     }
   };
 
@@ -95,7 +93,7 @@ const ChatPage = ({ id }: { id: string }) => {
                         <div className="text-sm text-gray-400 mb-2">{`Model: ${message.model}`}</div>
                       )}
                       {message.role === "bot" && message.isnew ? (
-                        <MarkdownReveal content={message.text} onSendData={onSendData} />
+                        <MarkdownReveal content={message.text}/>
                       ) : (
                         <>{message.text}</>
                       )}
@@ -131,7 +129,7 @@ const ChatPage = ({ id }: { id: string }) => {
             </div>
 
             {/* Input area */}
-            <ChatText onSendData={sendData} isfinished={typing} />
+            <ChatText onSendData={sendData} isfinished={typing} startmodel={startmodel} />
           </div>
         </div>
       </div>

@@ -51,16 +51,31 @@ const Sidebar = ({
       const userData = localStorage.getItem('userData');
       if (userData) {
         const parsedData = JSON.parse(userData);
+        console.log("userData in sidebar as parseData: ",parsedData)
         dispatch(setCurrentUser(parsedData));
       }
-      try {
-        const response = await gettitlelist(user.id, dispatch);
-        dispatch(setTitleList(response.title_list));
-      } catch (error) {
-        console.error('Error:', error);
+      else {
+        router.push('/auth');
       }
     };
     data();
+  },[])
+
+  useEffect(() => {
+    const data = async () => {
+      if(user.id)
+      {
+        try {
+          console.log("user1 in sidebar: ", user)
+          const response = await gettitlelist(user.id, dispatch);
+          dispatch(setTitleList(response.title_list));
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+    };
+    if(isAdmin == true)
+      data();
   }, [isAdmin]);
 
   useEffect(() => {
@@ -72,7 +87,8 @@ const Sidebar = ({
         console.error('Error:', error);
       }
     };
-    data();
+    if(librarybutton == true)
+      data();
   }, [librarybutton]);
 
   const isHidden = pathname === '/auth';
@@ -144,81 +160,7 @@ const Sidebar = ({
               {!collapseSidebar && <p>Library {isAdmin}</p>}
             </Link>
 
-            {librarybutton && Array.isArray(titlelist) && titlelist.length > 0 && (
-              titlelist.map((item: any, index: number) => (
-                <div
-                  key={index}
-                  className="flex flex-row justify-between items-center text-gray-400 hover:text-gray-200 hover:bg-[#353636] py-2 px-4 rounded cursor-pointer pl-10"
-                >
-                  <Link
-                    href={`/chat/${item.chat_id}`}
-                    className="flex flex-row gap-2 items-center w-full"
-                  >
-                    <ChatBotIcon className="h-4 w-4" />
-                    {!collapseSidebar && <p>{item.chat_title}</p>}
-                  </Link>
 
-                  {!collapseSidebar && (
-                    <button
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setDeletingThreadId(item.chat_id);
-                        const confirmed = window.confirm('Are you sure you want to delete this chat?');
-                        if (confirmed) {
-                          try {
-                            await deletethread(item.chat_id, dispatch, titlelist);
-                            const response = await gettitlelist(user.id, dispatch);
-                            dispatch(setTitleList(response.title_list));
-                          } catch (err) {
-                            console.error('Failed to delete thread', err);
-                          } finally {
-                            setDeletingThreadId(null);
-                          }
-                        }
-                      }}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      {deletingThreadId === item.chat_id ? (
-                        <svg
-                          className="animate-spin h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v8H4z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M6 2a1 1 0 011-1h6a1 1 0 011 1v1h4a1 1 0 110 2h-1v11a2 2 0 01-2 2H5a2 2 0 01-2-2V5H2a1 1 0 110-2h4V2zm2 5a1 1 0 10-2 0v8a1 1 0 102 0V7zm4 0a1 1 0 10-2 0v8a1 1 0 102 0V7z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
 
             {isAdmin && (
               <>

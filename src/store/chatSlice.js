@@ -10,29 +10,32 @@ const chatSlice = createSlice({
   initialState,
   reducers: {
     setList(state, action) {
-      console.log("action.payload", action.payload)
-      state.chats = action.payload;  // Update chat_list correctly
-      console.log("state.chats", state.chats)
+      return {
+        ...state,
+        chats: action.payload
+      }
     },
     setTitleList(state, action) {
       state.titlelist = action.payload;
     },
-    addtext(state, action) {
-        const existingChats = Array.isArray(state.chats) ? state.chats : [];
-        return { 
-          ...state,
-            chats: [...existingChats, action.payload]
-        }
-    },
-    Setold(state,action){
-      const existingChats = Array.isArray(state.chats.chats)? state.chats.chats : [];
-      for(chat of existingChats){
-        chat.isnew = false;
+    addchattext(state, action) {
+      const existingChats = Array.isArray(state.chats) ? state.chats : [];
+      return {
+        ...state,
+          chats: [...existingChats, action.payload]
       }
-      state.chats.chats = existingChats;
+    },
+    setchattitle(state, action) {
+      let titlelist = [];
+      state.titlelist.map((item) => {
+        if(item.chat_id == action.payload.chat_id)
+          titlelist.push({chat_id: item.chat_id, chat_title: action.payload.chat_title, chat_date: item.chat_date});
+        else titlelist.push(item);
+      })
+      state.titlelist = titlelist
     }
   },
 });
 
-export const { setList, setTitleList, addtext, Setold } = chatSlice.actions;
+export const { setList, setTitleList, addchattext, setold, setchattitle } = chatSlice.actions;
 export default chatSlice.reducer;

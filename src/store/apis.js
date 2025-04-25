@@ -1,6 +1,7 @@
 import api from '../lib/axios';
 import { setUsers, setSelectedUser, toggleUserStatus, toggleAdminStatus } from './userSlice';
-import { setList, setTitleList, addtext } from './chatSlice';
+import { setList, setTitleList, addchattext, setchattitle } from './chatSlice';
+import { getAnswerFromModel } from '@/component/LLM/model';
 
 // Fetch all users
 export const getAllUsers = async (dispatch) => {
@@ -84,7 +85,6 @@ export const deletethread = async (chatid, dispatch, titlelist) => {
 export const deletechatmessage = async (chatid, messageid, dispatch) => {
   try {
     let response = await api.delete(`/gpt/deletechatmessage/${chatid}/${messageid}/`);
-    console.log("Delete success:", response.data);
     response = await api.post(`/gpt/getchat/`,{
       chat_id : chatid,
     });
@@ -98,6 +98,8 @@ export const deletechatmessage = async (chatid, messageid, dispatch) => {
 }
 
 export const gettitlelist = async (userid, dispatch) => {
+  if(!userid)
+    return null
   try {
     const response = await api.post(`/gpt/gettitlelist/`,{
       user_id : userid,
@@ -110,16 +112,12 @@ export const gettitlelist = async (userid, dispatch) => {
   }
 }
 
-export const addchat = async (quesiton, userid, model, tem, token, dispatch) => {
+export const addchat = async (userid, question, dispatch) => {
   try {
     const response = await api.post(`/gpt/addchat/`,{
-      question : quesiton,
       user_id : userid,
-      model : model,
-      temperature : tem,
-      max_token : token,
+      question: question
     });
-    dispatch(setList(response.data.chat_list));
     dispatch(setTitleList(response.data.title_list)); // Dispatch the fetched chat to Redux
     return response.data;
   } catch (error) {
@@ -142,19 +140,45 @@ export const getchat = async (chatid, dispatch) => {
   }
 }
 
-export const askquestion = async (question, model, id, tem, token, web, dispatch) => {
-  try {
-    console.log(tem, token, id, question, model);
-    const response = await api.post(`/gpt/askgpt/`,{
-      question : question,
-      model : model,
-      chat_id : id,
-      temperature : tem,
-      max_token : token,
-      web : web,
+export const askquestion = async (question, model, chat_id, temperature, token, dispatch)=>{
+  try{
+    let chats = [{
+      role: "user",
+      text: question,
+      model: model,
+      date: new Date().toISOString().replace('Z', '') + '000',
+      deleteddate: null,
+      isnew: false,
+    }]
+    dispatch(addchattext(chats[0]));
+    let keys = JSON.parse(localStorage.getItem("keys"))
+    if(!keys) {
+      keys = await getallkeys();
+    }
+    const response = await getAnswerFromModel(question, model, temperature, token, keys);
+    const answer = typeof response === 'string' ? response : JSON.stringify(response);
+    chats.push({
+      role: "bot",
+      text: answer,
+      model: model,
+      date: new Date().toISOString().replace('Z', '') + '000',
+      deleteddate: null,
+      isnew: false,
+    })
+    dispatch(addchattext({...chats[1], isnew: true}));
+    return await addchats(chats, chat_id)
+  } catch (error) {
+    console.error('Error fetching chat:', error);
+    throw error;
+  }
+}
+
+const addchats = async (chats, chat_id) => {
+  try{
+    const response = await api.post(`/gpt/addchathistory`,{
+      chats : chats,
+      chat_id : chat_id,
     });
-    dispatch(addtext(response.data.answer)); // Dispatch the fetched chat to Redux
-    // console.log("after dispatching", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching chat:', error);
@@ -165,6 +189,7 @@ export const askquestion = async (question, model, id, tem, token, web, dispatch
 export const getallkeys = async () => {
   try {
     const response = await api.get(`/keys/get_all/`);
+    localStorage.setItem('keys', JSON.stringify(response.data.keys));
     return response.data.keys;
   } catch (error) {
     console.error('Error fetching keys:', error);
@@ -179,6 +204,20 @@ export const setonekey = async (name, value) => {
       value : value,
     });
     return response.data;
+  } catch (error) {
+    console.error('Error fetching keys:', error);
+    throw error;
+  }
+}
+
+export const updatechattitle = async (user_id, chat_id, chat_title, dispatch) => {
+  try {
+    const response = await api.post('/gpt/updatechattitle', {
+      user_id,
+      chat_id,
+      chat_title,
+    })
+    dispatch(setchattitle({chat_id, chat_title}));
   } catch (error) {
     console.error('Error fetching keys:', error);
     throw error;

@@ -6,14 +6,16 @@ import {
   addchat,
   gettitlelist
 } from "@/store/apis";
+import { setList } from "@/store/chatSlice";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { current } from "@reduxjs/toolkit";
 
 
 
 const HomePage = () => {
   let number = useSelector((state: any) => state.chat !== undefined ? state.chat.chat_id : null);
-  const user_id = useSelector((state: any) => state.users.currentuser !== undefined? state.users.currentuser.id : null);
+  const current_user = useSelector((state: any) => state.users.currentuser !== undefined? state.users.currentuser : localStorage.getItem("userData") || null);
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
@@ -24,13 +26,18 @@ const HomePage = () => {
     // Function to handle sending data
     setLoading(true);
     // console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
-    await addchat(question, user_id, model, tem, token, dispatch).then((response: any) => {
-      // console.log("Response in addchat:", response);
-      setLoading(false);
-      router.push(`/chat/${response.chat_list.chat_id}`);
-      // Handle the response here
+    const saveddate = {
+      model: model,
+      question: question,
+      tem: tem,
+      token: token
     }
-    ).catch((error: any) => {
+    dispatch(setList([]));
+    localStorage.setItem("newChat", JSON.stringify(saveddate));
+    await addchat(current_user.id, question, dispatch)
+    .then((response:any) => {
+      router.push(`/chat/${response.chat_id}`);
+    }).catch((error: any) => {
       console.error("Error:", error);
       // Handle the error here
     }
@@ -41,7 +48,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const data = async() => {
-    await gettitlelist(user_id, dispatch).then((response: any) => {
+      await gettitlelist(current_user.id, dispatch).then((response: any) => {
       // console.log("Response:", response);
       // Handle the response here
     }
@@ -53,6 +60,16 @@ const HomePage = () => {
   }
   }, []);
 
+  if(loading){
+    return (
+      <div className="flex items-center justify-center">
+        <div className="text-center">
+          <div className="loader-ring mb-4"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Main Content */}
@@ -62,7 +79,7 @@ const HomePage = () => {
         </h1>
 
         {/* Search Bar */}
-        <ChatText onSendData={sendData}/>
+        <ChatText onSendData={sendData} startmodel="gpt-3.5-turbo"/>
         
         {/* Skill Selection */}
 
