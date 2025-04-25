@@ -211,7 +211,6 @@ const ChatText = ({ onSendData, isfinished, startmodel }: ChildProps & Props) =>
               onClick={() => setWebSearchEnabled(prev => !prev)}
             >
               <FaGlobe />
-              {model}
             </button>
             <span className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-700 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
               Web search
