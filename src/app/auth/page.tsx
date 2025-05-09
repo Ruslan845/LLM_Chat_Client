@@ -41,11 +41,12 @@ export default function SignInPage() {
   const handleSignIn = (provider: string, methodValue: number) => {
     setMethod(methodValue);
     localStorage.setItem('authMethod', methodValue.toString());
-    signIn('google');
+    signIn(provider, { callbackUrl: '/home' }); // ✅ Fix
   };
 
   const sendTokenToBackend = async (methodValue: number, session: any) => {
     try {
+      console.log('Sending token to backend:', session);
       const response = await axios.post(
         `${API_BASE_URL}/auth/google/`,
         { token: methodValue == 1 ? session?.idToken : session?.accessToken },

@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import LinkedInProvider from 'next-auth/providers/linkedin';
 
-export default NextAuth({
+const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -33,7 +33,10 @@ export default NextAuth({
     },
   },
   pages: {
-    signIn: '/auth',
+    signIn: '/home',
   },
   debug: true, // Enable this for verbose logging
+  secret: process.env.NEXTAUTH_SECRET, // **CRITICAL** - Don't commit this to version control!
 });
+
+export { handler as GET, handler as POST };
