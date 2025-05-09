@@ -27,12 +27,13 @@ export default function SignInPage() {
   }, []);
 
   useEffect(() => {
+    console.log('env: ', process.env.NEXTAUTH_SECRET);
     const storedMethod = localStorage.getItem('authMethod');
     if (storedMethod) setMethod(Number(storedMethod));
   }, []);
 
   useEffect(() => {
-    if (session && method !== null && !localStorage.getItem('userData')) {
+    if (session && method !== null && !localStorage.getItem('userData')) {  
       setLoading(true);
       sendTokenToBackend(method, session);
     }
@@ -41,7 +42,7 @@ export default function SignInPage() {
   const handleSignIn = (provider: string, methodValue: number) => {
     setMethod(methodValue);
     localStorage.setItem('authMethod', methodValue.toString());
-    signIn(provider, { callbackUrl: '/home' }); // ✅ Fix
+    signIn(provider, { callbackUrl: '/auth' }); // ✅ Fix
   };
 
   const sendTokenToBackend = async (methodValue: number, session: any) => {
