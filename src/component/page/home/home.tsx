@@ -22,7 +22,7 @@ const HomePage = () => {
   
 
 
-  const sendData = async (question : string, model : string, tem : number, token : number) => {
+  const sendData = async (question : string, model : string, tem : number, token : number, web: boolean) => {
     // Function to handle sending data
     setLoading(true);
     // console.log("user_id:", user_id, "question:", question, "model:", model, "number:", number);
@@ -30,7 +30,8 @@ const HomePage = () => {
       model: model,
       question: question,
       tem: tem,
-      token: token
+      token: token,
+      web: web
     }
     dispatch(setList([]));
     localStorage.setItem("newChat", JSON.stringify(saveddate));

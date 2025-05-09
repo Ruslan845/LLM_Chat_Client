@@ -1,0 +1,33 @@
+.response-container {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+  }
+  
+  .plain-text {
+    white-space: pre-wrap; /* Preserve spaces and line breaks, and allow wrapping */
+    word-wrap: break-word; /* Break long words if necessary */
+    overflow-wrap: break-word; /* Ensure long words break properly */
+    margin-bottom: 1rem; /* Optional: Add spacing between blocks */
+    font-family: monospace; /* Optional: Use monospace font for preformatted text */
+  }
+  
+  .custom-bold {
+    font-weight: bold;
+  }
+  
+  .custom-ul,
+  .custom-ol {
+    margin-left: 1.5rem;
+  }
+  
+  .custom-li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .custom-paragraph {
+    margin-bottom: 1rem;
+  }

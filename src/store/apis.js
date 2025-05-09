@@ -1,7 +1,14 @@
 import api from '../lib/axios';
+import axios from 'axios';
 import { setUsers, setSelectedUser, toggleUserStatus, toggleAdminStatus } from './userSlice';
 import { setList, setTitleList, addchattext, setchattitle } from './chatSlice';
-import { getAnswerFromModel } from '@/component/LLM/model';
+import 'highlight.js/styles/github.css';
+
+
+let tokenizers;
+if (typeof window === 'undefined') {
+  tokenizers = require('@anush008/tokenizers-linux-x64-gnu');
+}
 
 // Fetch all users
 export const getAllUsers = async (dispatch) => {
@@ -140,40 +147,87 @@ export const getchat = async (chatid, dispatch) => {
   }
 }
 
-export const askquestion = async (question, model, chat_id, temperature, token, dispatch)=>{
-  try{
+export const websearch = async (question, key) => {
+  const params = new URLSearchParams({
+    api_key : key,
+    engine: 'google',
+    q: question,
+  });
+  const response = await fetch(`https://serpapi.com/search.json?${params}`)
+  const data = await response.json();
+  console.log("websearch result: ", data);
+  return data;
+}
+
+// export const saveChatToBackend = async (question, response, model, tem, token, web) => {
+//   try {
+//     const payload = {
+//       question,
+//       response,
+//       model,
+//       temperature: tem,
+//       max_tokens: token,
+//       web_search_enabled: web,
+//     };
+
+//     await axios.post("/api/saveChat", payload, {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     console.log("Chat saved to backend successfully");
+//   } catch (error) {
+//     console.error("Error saving chat to backend:", error);
+//   }
+// };
+
+// Modified askquestion function to support streaming
+
+export const askquestion = async (question,model,id,tem,token,web,dispatch) => {
+  try {
     let chats = [{
       role: "user",
       text: question,
       model: model,
-      date: new Date().toISOString().replace('Z', '') + '000',
+      date: new Date().toISOString(),
       deleteddate: null,
       isnew: false,
     }]
+    console.log("chats: ", chats);
     dispatch(addchattext(chats[0]));
+    addchats(chats, id)
     let keys = JSON.parse(localStorage.getItem("keys"))
     if(!keys) {
       keys = await getallkeys();
     }
-    const response = await getAnswerFromModel(question, model, temperature, token, keys);
-    const answer = typeof response === 'string' ? response : JSON.stringify(response);
-    chats.push({
+    let response_web_search = ""
+    dispatch(addchattext({  
       role: "bot",
-      text: answer,
+      text: "Loading...",
       model: model,
-      date: new Date().toISOString().replace('Z', '') + '000',
+      date: new Date().toISOString(),
       deleteddate: null,
-      isnew: false,
-    })
-    dispatch(addchattext({...chats[1], isnew: true}));
-    return await addchats(chats, chat_id)
+      isnew: true,
+    }));
+    const fullResponse = await axios.post('/api/stream', {
+      id,
+      question,
+      model,
+      temperature: tem,
+      max_tokens: token,
+      keys, // Pass keys if needed
+      response_web_search, // Pass web search results if needed
+    });
+
+    return fullResponse; // Return the full response for saving to the backend
   } catch (error) {
-    console.error('Error fetching chat:', error);
+    console.error("Error in askquestion:", error);
     throw error;
   }
-}
+};
 
-const addchats = async (chats, chat_id) => {
+export const addchats = async (chats, chat_id) => {
   try{
     const response = await api.post(`/gpt/addchathistory`,{
       chats : chats,

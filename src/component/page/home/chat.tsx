@@ -189,14 +189,20 @@ const ChatText = ({ onSendData, isfinished, startmodel }: ChildProps & Props) =>
 
   return (
     <div className="relative w-full border border-gray-600 max-w-4xl mb-4 bg-gray-800 rounded-xl p-4">
-      <input
-        type="text"
+      <textarea
         placeholder="Ask anything..."
-        className="w-full bg-transparent text-white focus:outline-none placeholder-gray-400"
+        className="w-full bg-transparent text-white focus:outline-none placeholder-gray-400 resize-none"
         value={question}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e:any) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // Prevent newline
+            handleKeyDown(e);
+          }
+        }}
         onChange={(e) => setQuestion(e.target.value)}
+        rows={3}
       />
+
 
       <div className="w-full justify-between mt-8 flex items-center">
         <TwoStepModelSelector model={model} onModelChange={setModel} />

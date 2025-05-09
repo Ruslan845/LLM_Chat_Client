@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllUsers, gettitlelist, getchat, deletethread } from '@/store/apis';
 import { FiSearch } from 'react-icons/fi';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import MarkdownReveal from "@/component/MarkdownMessage";
 
 const NAVBAR_HEIGHT = '64px';
 
@@ -89,7 +90,7 @@ const ChatHistoryPage = () => {
                 className={`cursor-pointer p-3 rounded ${selectedUserId === user.id ? 'bg-blue-800' : 'bg-gray-800'} hover:bg-blue-700`}
                 onClick={() => toggleExpand(user)}
               >
-                <div className="font-semibold">{user.username}</div>
+                <div className="font-semibold">{user.username}</div>``
                 <div className="text-sm text-gray-400">{user.email}</div>
               </div>
               {expandedUsers[user.id] && selectedUserId === user.id && (
@@ -138,10 +139,11 @@ const ChatHistoryPage = () => {
           {selectedThreadId && chats.length > 0 && chats.map((chat: any) => (
             <div
               key={chat.id}
-              className={`p-3 rounded-lg inline-block max-w-xl text-sm whitespace-pre-wrap ${chat.role === 'bot' ? 'self-start text-left bg-gray-700' : 'self-end text-right bg-gray-800'} ${chat.deleteddate ? 'bg-red-900' : ''}`}
+              className={`p-3 rounded-lg inline-block max-w-xl text-sm whitespace-pre-wrap ${chat.role === 'bot' ? 'self-start text-left bg-gray-700' : 'self-end bg-gray-800'} ${chat.deleteddate ? 'bg-red-900' : ''}`}
             >
               {chat.role === 'bot' && <div className="text-xs text-blue-300 mb-1">{chat.model}</div>}
-              <div>{chat.text}</div>
+              {chat.role === 'bot' && <MarkdownReveal content={chat.text}/>}
+              {chat.role === 'user' && <div className="whitespace-pre-wrap">{chat.text}</div>}
               <div className="text-xs text-gray-400 mt-1">
                 {`Created at: ${chat.date}`}
                 {chat.deleteddate && (

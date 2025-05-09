@@ -1,56 +1,108 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import ChatText from "./chat";
-import { useDispatch, useSelector } from 'react-redux';
-import { askquestion, getchat, deletechatmessage } from '@/store/apis';
-import MarkdownReveal from '@/component/MarkdownMessage';
-import { FaTrash } from 'react-icons/fa';
-import { start } from 'repl';
+import { useDispatch, useSelector } from "react-redux";
+import { getchat, deletechatmessage, askquestion, addchats } from "@/store/apis";
+import { addchattext, updatechattext } from "@/store/chatSlice";
+import MarkdownReveal from "@/component/MarkdownMessage";
+import { FaTrash } from "react-icons/fa";
+import type { Socket } from "socket.io-client"; // Import Socket.IO client
+import { initSocket } from "@/lib/socket";
 
 const ChatPage = ({ id }: { id: string }) => {
   const user = useSelector((state: any) => state.users.currentuser);
   const messages = useSelector((state: any) => state.chats.chats);
-  const [loading, setLoading] = useState<any>(false);
-  const [typing, setTyping] = useState<any>(false);
-  const [startmodel, setStartmodel] = useState<any>("gpt-3.5-turbo");
+  const [loading, setLoading] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [startmodel, setStartmodel] = useState("gpt-3.5-turbo");
   const [deletingMessageId, setDeletingMessageId] = useState<number | null>(null);
   const dispatch = useDispatch();
-  const scrollRef = useRef(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const get = async () => {
+    const func = async () => {
+      await axios.get("/api/socket");
+      const socketInstance = initSocket();
+      socketInstance.on("connect", () => {
+        console.log("Frontend client connected to socket server");
+      });
+      socketInstance.on("LLM_response", async (data: any) => {
+        // console.log("Received data from server: ", data);
+        if (data && id == data.id) {
+          const { message, model, isnew } = data;
+          // console.log("Message: ", message);
+          const newMessage = {
+            role: "bot",
+            text: message,
+            model: model,
+            isnew: isnew,
+          };
+          // console.log("New message: ", newMessage);
+          dispatch(updatechattext(newMessage));
+          setTyping(false);
+          if (data.isfinish){
+            console.log("Finished message: ", message);
+            let chats = [{
+              role: "bot",
+              text: message,
+              model: model,
+              date: new Date().toISOString(),
+              deleteddate: null,
+              isnew: false,
+            }];
+            await addchats(chats, id);
+            await getchat(id, dispatch);
+            return;
+          }
+        }
+      }
+      );
+      setSocket(socketInstance);
+
+      return () => {
+        socketInstance.disconnect();
+      }
+    }
+    func();
+  },[]);
+
+  // Setup Socket.IO listener for AI responses
+
+  useEffect(() => {
+    const fetchChat = async () => {
       try {
-        setLoading(true)
-        const as_string = localStorage.getItem("newChat")
-        if(as_string)
-        {
-          localStorage.removeItem("newChat")
+        setLoading(true);
+        const as_string = localStorage.getItem("newChat");
+        if (as_string) {
+          localStorage.removeItem("newChat");
           const newchat = JSON.parse(as_string);
           setStartmodel(newchat.model);
-          await askquestion(newchat.question, newchat.model, id, newchat.tem, newchat.token, dispatch )
+          // await getchat(id, dispatch);
+          sendData(newchat.question, newchat.model, newchat.tem, newchat.token, newchat.web);
         }
-        else{
+        else {
           await getchat(id, dispatch);
         }
-        setLoading(false)
+        setLoading(false);
       } catch (error: any) {
-        console.error("Error:", error);
+        console.error("Error fetching chat:", error);
       }
     };
-    if(id)
-      get();
-  }, [id]);
+
+    if (id) fetchChat();
+  }, [id, dispatch]);
 
   const sendData = async (question: string, model: string, tem: number, token: number, web: boolean) => {
     setLoading(true);
-    console.log(question, model, tem, token)
     setTyping(true);
-    try {
-      await askquestion(question, model, id, tem, token, dispatch);
-    } catch (error: any) {
-      console.error("Error:", error);
-    }
+    console.log("Sending question:", question, model, tem, token);
+    await askquestion(question, model, id , tem, token, web, dispatch)
+
+    // Emit the message via WebSocket
+
     scrollToBottom();
     setLoading(false);
   };
@@ -60,14 +112,14 @@ const ChatPage = ({ id }: { id: string }) => {
     try {
       await deletechatmessage(id, message_id, dispatch);
     } catch (error: any) {
-      console.error("Error:", error);
+      console.error("Error deleting message:", error);
     }
     setDeletingMessageId(null);
   };
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
-      (scrollRef.current as HTMLElement).scrollTop = (scrollRef.current as HTMLElement).scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
 
@@ -85,40 +137,48 @@ const ChatPage = ({ id }: { id: string }) => {
           <div className="flex flex-col h-[80vh]">
             {/* Messages */}
             <div ref={scrollRef} className="flex-grow overflow-y-auto bg-gray-700 p-4 rounded-lg mb-4 space-y-4">
-              {Array.isArray(messages) && messages.length > 0 ? messages.filter(msg => msg.deleteddate == null).map((message: any, index: number) => (
-                <div key={index} className="relative group w-full">
-                  <div className={`flex ${message.role === "user" ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`${message.role === "user" ? 'bg-blue-500 text-white' : 'bg-gray-600 text-white'} p-3 rounded-lg ${message.role === "user" ? 'max-w-xs' : 'w-full'}`}>
-                      {message.role === "bot" && message.model && (
-                        <div className="text-sm text-gray-400 mb-2">{`Model: ${message.model}`}</div>
-                      )}
-                      {message.role === "bot" && message.isnew ? (
-                        <MarkdownReveal content={message.text}/>
-                      ) : (
-                        <>{message.text}</>
-                      )}
-                    </div>
+              {Array.isArray(messages) && messages.length > 0
+                ? messages
+                    .filter((msg) => msg.deleteddate == null)
+                    .map((message: any, index: number) => (
+                      <div key={index} className="relative group w-full">
+                        <div className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                          <div
+                            className={`${
+                              message.role === "user" ? "bg-blue-500 text-white" : "bg-gray-600 text-white"
+                            } p-3 rounded-lg ${message.role === "user" ? "whitespace-pre-wrap" : "w-full"}`}
+                          >
+                            {message.role === "bot" && message.model && (
+                              <div className="text-sm text-gray-400 mb-2">{`Model: ${message.model}`}</div>
+                            )}
+                            {message.role === "bot" ? (
+                              <MarkdownReveal content={message.text} />
+                            ) : (
+                              <>{message.text}</>
+                            )}
+                          </div>
 
-                    {/* Delete Button or Spinner */}
-                    {deletingMessageId === index ? (
-                      <div className="absolute right-1 bottom-1 text-gray-400 animate-spin">
-                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                        </svg>
+                          {/* Delete Button or Spinner */}
+                          {deletingMessageId === index ? (
+                            <div className="absolute right-1 bottom-1 text-gray-400 animate-spin">
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => onDeleteButton(index)}
+                              className="absolute right-1 bottom-1 text-gray-400 hover:text-red-500 hidden group-hover:block p-1"
+                            >
+                              <FaTrash size={14} />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onDeleteButton(index)}
-                        className="absolute right-1 bottom-1 text-gray-400 hover:text-red-500 hidden group-hover:block p-1"
-                      >
-                        <FaTrash size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )) : null}
+                    ))
+                : null}
               {loading && (
                 <div className="flex items-center justify-center">
                   <div className="text-center">
